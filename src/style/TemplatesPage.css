@@ -1,0 +1,308 @@
+/* ---------------- Templates Page ---------------- */
+.templates-page {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f5f7;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Content Area */
+.templates-page .templates-content {
+  flex: 1;
+  padding: 2.5rem;
+  margin-left: 250px;
+}
+
+/* Header */
+.templates-page .page-header h2 {
+  color: #5e2ca5;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.templates-page .page-header .subtitle {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Empty / Loading */
+.templates-page .loading,
+.templates-page .empty-state {
+  text-align: center;
+  color: #888;
+}
+.templates-page .empty-state {
+  padding: 5rem 2rem;
+}
+.templates-page .empty-state svg {
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+/* ---------------- Project Cards ---------------- */
+.templates-page .projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.8rem;
+}
+.templates-page .project-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+.templates-page .project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.12);
+}
+.templates-page .project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.templates-page .project-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+.templates-page .status-badge {
+  padding: 6px 14px;
+  border-radius: 22px;
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.templates-page .status-badge.active { background: #4caf50; }
+.templates-page .status-badge.pending { background: #ff9800; }
+.templates-page .status-badge.closed { background: #f44336; }
+
+.templates-page .created-by {
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.templates-page .card-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+.templates-page .card-actions button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.templates-page .card-actions button:hover {
+  transform: translateY(-2px);
+}
+.templates-page .view-btn {
+  background: linear-gradient(135deg, #6a0dad, #7f1eff);
+  color: #fff;
+}
+.templates-page .view-btn:hover { background: linear-gradient(135deg, #580ca1, #6f0edb); }
+.templates-page .delete-btn {
+  background: #f44336;
+  color: #fff;
+}
+.templates-page .delete-btn:hover { background: #d32f2f; }
+
+/* ---------------- Modal ---------------- */
+.templates-page .modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.templates-page .modal {
+  background: #fff;
+  border-radius: 18px;
+  width: 90%; 
+  max-width: 1200px;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  animation: slideUp 0.35s ease-out;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal Header */
+.templates-page .modal h3 {
+  padding: 1.2rem 1.5rem;
+  background: linear-gradient(135deg, #6a0dad, #7f1eff);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.templates-page .close-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.templates-page .close-btn:hover {
+  transform: scale(1.3);
+}
+
+/* Modal Body */
+.templates-page .modal-body {
+  display: flex;
+  flex: 1;
+  gap: 2rem;
+  padding: 1.5rem;
+}
+.templates-page .modal-tabs {
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  border-right: 1px solid #eee;
+  background: #f9f9f9;
+  padding: 0.5rem;
+  border-radius: 10px;
+}
+.templates-page .modal-tabs button {
+  background: none;
+  border: none;
+  padding: 1rem 1.2rem;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 500;
+  color: #555;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+}
+.templates-page .modal-tabs button:hover {
+  background: #eee;
+}
+.templates-page .modal-tabs button.active {
+  background: linear-gradient(135deg, #6a0dad, #7f1eff);
+  color: #fff;
+}
+
+/* Modal Content */
+.templates-page .modal-content {
+  flex: 1;
+  padding: 1rem;
+  max-height: 600px;
+  overflow-y: auto;
+  font-size: 0.96rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+/* Requirements */
+.templates-page .requirements-section {
+  white-space: pre-wrap;
+}
+.templates-page .requirement-text strong {
+  color: #6a0dad;
+}
+
+/* Document Download */
+.templates-page .document-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.templates-page .download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #6a0dad, #7f1eff);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+.templates-page .download-btn:hover {
+  background: linear-gradient(135deg, #580ca1, #6f0edb);
+}
+/* Filter Buttons */
+.templates-page .filter-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.templates-page .filter-container button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 12px;
+  background: #eee;
+  color: #555;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.templates-page .filter-container button.active {
+  background: linear-gradient(135deg, #6a0dad, #7f1eff);
+  color: #fff;
+}
+.templates-page .filter-container button:hover:not(.active) {
+  background: #ddd;
+}
+.start-processing-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease-in-out;
+}
+
+.start-processing-btn:hover {
+  background: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 950px) {
+  .templates-page .modal-body {
+    flex-direction: column;
+  }
+  .templates-page .modal-tabs {
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    overflow-x: auto;
+  }
+  .templates-page .modal-tabs button {
+    flex: 1;
+    text-align: center;
+  }
+}

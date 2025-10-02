@@ -1,0 +1,339 @@
+/* NavBar.css */
+/* Global styles to remove focus outline */
+.navbar a,
+.navbar button,
+.navbar-logo {
+  outline: none;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(17, 17, 17, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(147, 51, 234, 0.1);
+  transition: all 0.3s ease;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+}
+
+/* Logo Styles */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #9333ea, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+/* Navigation Menu */
+.navbar-menu {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-nav {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2rem;
+}
+
+.nav-item {
+  position: relative;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #e5e7eb;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  outline: none;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #9333ea, #c084fc);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #c084fc;
+  transform: translateY(-2px);
+}
+
+.nav-link:focus {
+  outline: none;
+}
+
+.nav-link:hover::before,
+.nav-link.active::before {
+  width: 100%;
+}
+
+.nav-link.active {
+  color: #c084fc;
+}
+
+/* Login Button */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.login-btn {
+  position: relative;
+  background: linear-gradient(135deg, #9333ea, #7c3aed);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+  outline: none;
+}
+
+.login-btn:hover,
+.login-btn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.4);
+  outline: none;
+}
+
+.btn-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.login-btn:hover .btn-glow {
+  left: 100%;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hamburger {
+  width: 25px;
+  height: 18px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: 0.5s ease-in-out;
+}
+
+.hamburger span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background: #9333ea;
+  border-radius: 9px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: 0.25s ease-in-out;
+}
+
+.hamburger span:nth-child(1) {
+  top: 0px;
+}
+
+.hamburger span:nth-child(2) {
+  top: 7px;
+}
+
+.hamburger span:nth-child(3) {
+  top: 14px;
+}
+
+.hamburger.open span:nth-child(1) {
+  top: 7px;
+  transform: rotate(135deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+  left: -60px;
+}
+
+.hamburger.open span:nth-child(3) {
+  top: 7px;
+  transform: rotate(-135deg);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  background: rgba(17, 17, 17, 0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(147, 51, 234, 0.1);
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu.open {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-nav {
+  list-style: none;
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mobile-nav-item {
+  text-align: center;
+}
+
+.mobile-nav-link {
+  text-decoration: none;
+  color: #e5e7eb;
+  font-weight: 500;
+  font-size: 1.1rem;
+  padding: 0.75rem 0;
+  display: block;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  outline: none;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:focus,
+.mobile-nav-link.active {
+  color: #c084fc;
+  background: rgba(147, 51, 234, 0.1);
+  outline: none;
+}
+
+.mobile-login-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #9333ea, #7c3aed);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  outline: none;
+}
+
+.mobile-login-btn:hover,
+.mobile-login-btn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.4);
+  outline: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 1rem;
+  }
+  
+  .navbar-menu,
+  .navbar-actions {
+    display: none;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex;
+  }
+  
+  .logo-text {
+    font-size: 1.25rem;
+  }
+  
+  .logo-icon {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .cube-face {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .cube-front { transform: rotateY(0deg) translateZ(17.5px); }
+  .cube-back { transform: rotateY(180deg) translateZ(17.5px); }
+  .cube-right { transform: rotateY(90deg) translateZ(17.5px); }
+  .cube-left { transform: rotateY(-90deg) translateZ(17.5px); }
+  .cube-top { transform: rotateX(90deg) translateZ(17.5px); }
+  .cube-bottom { transform: rotateX(-90deg) translateZ(17.5px); }
+}
+
+@media (max-width: 480px) {
+  .navbar-container {
+    height: 70px;
+  }
+  
+  .mobile-menu {
+    top: 70px;
+  }
+  
+  .mobile-nav {
+    padding: 1.5rem;
+  }
+}
