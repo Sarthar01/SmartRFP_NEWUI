@@ -76,15 +76,9 @@ const Proposal: React.FC = () => {
     uploadSuccess: null,
     isDragOver: false,
   });
-  const [formData, setFormData] = useState<ProjectMetadata>({
-  projectName: '',
-  budget: 0,
-  budgetCurrency: 'USD',
-  startDate: new Date().toISOString().split('T')[0],
-  endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
-  description: '',
-  priority: 'Medium',
-  department: ''
+  const [formData, setFormData] = useState({
+  title: '',
+  description: ''
 });
 
   const getToken = () => localStorage.getItem("token") || ""
@@ -207,7 +201,7 @@ const handleFormSubmit = async () => {
       uploadState.uploadForm.description,
       uploadState.uploadForm.file!,
       token,
-      projectMetadata // <-- send metadata
+      
     );
 
     setUploadState(prev => ({
@@ -353,69 +347,58 @@ const getPriorityColor = (priority?: string) => {
         <div className="metadata-modal" onClick={e => e.stopPropagation()}>
           <h2>Project Metadata</h2>
           <form onSubmit={async (e) => {
-            e.preventDefault();
-            if (!uploadState.uploadForm.file) {
-              alert("Please select a file first!");
-              return;
-            }
+  e.preventDefault();
+  if (!uploadState.uploadForm.file) {
+    alert("Please select a file first!");
+    return;
+  }
 
-            try {
-              setUploadState(prev => ({ ...prev, isUploading: true }));
+  try {
+    setUploadState(prev => ({ ...prev, isUploading: true }));
 
-              await createRfpProject(
-                uploadState.uploadForm.title,
-                uploadState.uploadForm.description,
-                uploadState.uploadForm.file,
-                token!,
-                formData
-              );
+    await createRfpProject(
+      formData.title,
+      formData.description,
+      uploadState.uploadForm.file,
+      token
+    );
 
-              setUploadState(prev => ({
-                ...prev,
-                isUploading: false,
-                uploadedFiles: [],
-                uploadForm: { title: "", description: "" },
-                uploadSuccess: "Project uploaded successfully!"
-              }));
+    setUploadState(prev => ({
+      ...prev,
+      isUploading: false,
+      uploadedFiles: [],
+      uploadForm: { title: "", description: "" },
+      uploadSuccess: "Project uploaded successfully!"
+    }));
 
-              setFormData({
-                projectName: '',
-                budget: 0,
-                budgetCurrency: 'USD',
-                startDate: new Date().toISOString().split('T')[0],
-                endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
-                description: '',
-                priority: 'Medium',
-                department: ''
-              });
-              setIsMetadataVisible(false);
-              fetchRfpProjects();
-            } catch (error) {
-              console.error("Upload error:", error);
-              setUploadState(prev => ({
-                ...prev,
-                isUploading: false,
-                uploadError: "Upload failed"
-              }));
-            }
-          }}>
-            <input type="text" placeholder="Project Name" value={formData.projectName}
-              onChange={e => setFormData({...formData, projectName: e.target.value})} required />
-            <input type="number" placeholder="Budget" value={formData.budget}
-              onChange={e => setFormData({...formData, budget: parseFloat(e.target.value) || 0})} />
-            <select value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value as any})}>
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
-            </select>
-            <textarea placeholder="Description" value={formData.description}
-              onChange={e => setFormData({...formData, description: e.target.value})} />
-            <input type="text" placeholder="Department" value={formData.department}
-              onChange={e => setFormData({...formData, department: e.target.value})} required />
-            <button type="submit" disabled={uploadState.isUploading}>
-              {uploadState.isUploading ? "Saving..." : "Submit Project Metadata"}
-            </button>
-          </form>
+    setFormData({ title: "", description: "" });
+    setIsMetadataVisible(false);
+    fetchRfpProjects();
+  } catch (error) {
+    console.error("Upload error:", error);
+    setUploadState(prev => ({
+      ...prev,
+      isUploading: false,
+      uploadError: "Upload failed"
+    }));
+  }
+}}>
+  <input
+    type="text"
+    placeholder="Project Name"
+    value={formData.title}
+    onChange={e => setFormData({ ...formData, title: e.target.value })}
+    required
+  />
+  <textarea
+    placeholder="Description (optional)"
+    value={formData.description}
+    onChange={e => setFormData({ ...formData, description: e.target.value })}
+  />
+  <button type="submit" disabled={uploadState.isUploading}>
+    {uploadState.isUploading ? "Saving..." : "Submit"}
+  </button>
+</form>
         </div>
       </div>
     )}
@@ -524,7 +507,14 @@ const getPriorityColor = (priority?: string) => {
               tabIndex={0}
               aria-label="Upload RFP documents"
             >
-              <input type="file" ref={fileInputRef} onChange={handleFileInputChange} accept=".pdf,.doc,.docx,.xls,.xlsx" style={{ display: "none" }} />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileInputChange}
+                  accept="application/pdf,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  style={{ display: "none" }}
+                />
+
 
               <div className="upload-content">
                 <div className="proposal-label">RFP Document Upload</div>
@@ -536,7 +526,7 @@ const getPriorityColor = (priority?: string) => {
                       <div className="upload-primary">Drop RFP document here</div>
                       <div className="upload-secondary">or click to browse</div>
                     </div>
-                    <div className="supported-formats"><small>Supports PDF, Word, Excel files</small></div>
+                    <div className="supported-formats"><small>Supports PDF, DOC, and DOCX file</small></div>
                   </div>
                 ) : (
                   <div className="uploaded-files">

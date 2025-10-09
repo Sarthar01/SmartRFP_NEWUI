@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import Sidebar from "../components/sidebar";
 import "../style/Dashboard.css";
 import {
@@ -11,6 +11,7 @@ import {
   FaChartLine,
 } from "react-icons/fa";
 import axios from "axios";
+import { createRfpProject } from "../services/api1";
 
 // Axios instance
 const api = axios.create({
@@ -164,6 +165,96 @@ const Dashboard: React.FC = () => {
       ...rfpStats.monthly.map((m: any) => Math.max(m.proposals, m.wins))
     );
   };
+const fileInputRef = useRef<HTMLInputElement>(null);
+
+const [uploadState, setUploadState] = useState<{
+  uploadedFiles: File[];
+  isUploading: boolean;
+  uploadForm: { title: string; description: string; file?: File };
+  uploadError: string | null;
+  uploadSuccess: string | null;
+  isDragOver: boolean;
+}>({
+  uploadedFiles: [],
+  isUploading: false,
+  uploadForm: { title: "", description: "" },
+  uploadError: null,
+  uploadSuccess: null,
+  isDragOver: false,
+});
+const token = localStorage.getItem("token") || "";
+const [isMetadataVisible, setIsMetadataVisible] = useState(false);
+
+const [formData, setFormData] = useState({
+  title: "",
+  description: "",
+});
+
+const handleLocalFileClick = () => fileInputRef.current?.click();
+
+const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (e.target.files && e.target.files.length > 0) {
+    const files = Array.from(e.target.files);
+    setUploadState(prev => ({
+      ...prev,
+      uploadedFiles: files,
+      uploadForm: { ...prev.uploadForm, file: files[0] },
+    }));
+  }
+};
+
+const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setUploadState(prev => ({ ...prev, isDragOver: true })); };
+const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setUploadState(prev => ({ ...prev, isDragOver: false })); };
+const handleDrop = (e: React.DragEvent) => {
+  e.preventDefault();
+  setUploadState(prev => ({ ...prev, isDragOver: false }));
+  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    const files = Array.from(e.dataTransfer.files);
+    setUploadState(prev => ({
+      ...prev,
+      uploadedFiles: files,
+      uploadForm: { ...prev.uploadForm, file: files[0] },
+    }));
+  }
+};
+
+const removeFile = () => setUploadState(prev => ({ ...prev, uploadedFiles: [], uploadForm: { title: "", description: "" } }));
+
+const handleFormSubmit = async () => {
+  if (!uploadState.uploadForm.file || !uploadState.uploadForm.title) return;
+
+  setUploadState(prev => ({ ...prev, isUploading: true }));
+
+  try {
+    await createRfpProject(
+      uploadState.uploadForm.title,
+      uploadState.uploadForm.description,
+      uploadState.uploadForm.file!,
+      localStorage.getItem("token") || ""
+    );
+
+    setUploadState(prev => ({
+      ...prev,
+      isUploading: false,
+      uploadedFiles: [],
+      uploadForm: { title: "", description: "" },
+      uploadSuccess: "Project uploaded successfully!",
+    }));
+  } catch (error) {
+    console.error("Upload error:", error);
+    setUploadState(prev => ({ ...prev, isUploading: false, uploadError: "Upload failed" }));
+  }
+};
+
+const getFileIcon = (type: string) => {
+  if (type.includes("pdf")) return "📄";
+  if (type.includes("word")) return "📝";
+  if (type.includes("excel")) return "📊";
+  return "📁";
+};
+
+const formatFileSize = (size: number) => `${(size / 1024).toFixed(2)} KB`;
+
 
   return (
     <div className="dashboard-container">
@@ -311,23 +402,146 @@ const Dashboard: React.FC = () => {
                   </div>
 
                   {/* Upload RFP */}
-                  <div className="upload-rfp-card">
-                    <div className="upload-icon">
-                      <FaFileAlt />
-                    </div>
-                    <div className="upload-content">
-                      <h3 className="upload-title">Upload RFP Files</h3>
-                      <p className="upload-description">
-                        Drag & Drop or browse to upload RFP files
-                      </p>
-                      <button
-                        className="proposal-card-btn1"
-                        onClick={() => alert("Hook API to upload RFP")}
-                      >
-                        Upload
-                      </button>
-                    </div>
+                 <>
+  {isMetadataVisible && (
+    <div className="metadata-overlay" onClick={() => setIsMetadataVisible(false)}>
+      <div className="metadata-modal" onClick={(e) => e.stopPropagation()}>
+        <h2>Project Metadata</h2>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!uploadState.uploadForm.file) {
+              alert("Please select a file first!");
+              return;
+            }
+            try {
+              setUploadState((prev) => ({ ...prev, isUploading: true }));
+
+              await createRfpProject(
+                formData.title,
+                formData.description,
+                uploadState.uploadForm.file,
+                token
+              );
+
+              setUploadState((prev) => ({
+                ...prev,
+                isUploading: false,
+                uploadedFiles: [],
+                uploadForm: { title: "", description: "" },
+                uploadSuccess: "Project uploaded successfully!",
+              }));
+
+              setFormData({ title: "", description: "" });
+              setIsMetadataVisible(false);
+            } catch (error) {
+              console.error("Upload error:", error);
+              setUploadState((prev) => ({
+                ...prev,
+                isUploading: false,
+                uploadError: "Upload failed",
+              }));
+            }
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Project Name"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            required
+          />
+          <textarea
+            placeholder="Description (optional)"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          />
+          <button type="submit" disabled={uploadState.isUploading}>
+            {uploadState.isUploading ? "Saving..." : "Submit"}
+          </button>
+        </form>
+      </div>
+    </div>
+  )}
+
+  <div
+    className={`upload-rfp-card upload-box ${uploadState.isDragOver ? "drag-over" : ""} ${uploadState.isUploading ? "uploading" : ""}`}
+    onDragOver={handleDragOver}
+    onDragLeave={handleDragLeave}
+    onDrop={handleDrop}
+    onClick={!uploadState.isUploading ? handleLocalFileClick : undefined}
+    role="button"
+    tabIndex={0}
+    aria-label="Upload RFP documents"
+  >
+    <input
+      type="file"
+      ref={fileInputRef}
+      onChange={handleFileInputChange}
+      accept="application/pdf,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      style={{ display: "none" }}
+    />
+
+    <div className="upload-content">
+      <h3 className="upload-title">Upload RFP Files</h3>
+      <p className="upload-description">Drag & Drop or browse to upload RFP files</p>
+
+      {uploadState.uploadedFiles.length === 0 && !uploadState.isUploading ? (
+        <div className="upload-empty">
+          <div className="upload-icon">📁</div>
+          <div className="upload-text">
+            <div className="upload-primary">Drop RFP document here</div>
+            <div className="upload-secondary">or click to browse</div>
+          </div>
+          <div className="supported-formats"><small>Supports PDF, DOC, and DOCX file</small></div>
+        </div>
+      ) : (
+        <div className="uploaded-files">
+          {uploadState.uploadedFiles.map((file, index) => (
+            <div key={file.name + "_" + file.size + "_" + index} className="file-item">
+              <div className="file-name">{file.name}</div>
+              <div className="file-info">
+                <span className="file-icon">{getFileIcon(file.type)}</span>
+                <div className="file-details">
+                  <div className="file-name">{file.name}</div>
+                  <div className="file-meta">
+                    <span className="file-size">{formatFileSize(file.size)}</span>
+                    <span className="file-source">📂 Local</span>
                   </div>
+                </div>
+              </div>
+              <button
+                className="file-remove"
+                onClick={(e) => { e.stopPropagation(); removeFile(); }}
+                aria-label={`Remove ${file.name}`}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+
+          <div className="upload-actions">
+            <button
+              className="proposal-card-btn1"
+              onClick={(e) => { e.stopPropagation(); handleFormSubmit(); }}
+              disabled={!uploadState.uploadForm.title?.trim() || !uploadState.uploadForm.file}
+            >
+              {uploadState.isUploading ? "Uploading..." : "Upload"}
+            </button>
+            <button
+              className="metadata-button"
+              onClick={(e) => { e.stopPropagation(); setIsMetadataVisible(true); }}
+            >
+              📝 Add Details
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</>
+
+
 
                   {/* Analytics */}
                   <div className="analytics-card">

@@ -10,7 +10,7 @@ export default defineConfig({
     
     proxy: {
       '/api': {
-        target: 'http://45.198.59.161', // Nginx port 80
+        target: 'http://localhost', // Nginx port 80
         changeOrigin: true,
         secure: false,
       },

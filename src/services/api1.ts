@@ -147,29 +147,16 @@ export const createRfpProject = async (
   title: string,
   description: string,
   file: File,
-  token: string,
-  metadata?: ProjectMetadata
+  token: string
 ): Promise<RfpProject> => {
   try {
-    const formData = new FormData()
-    formData.append("title", title)
-    formData.append("description", description)
-    formData.append("file", file)
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("file", file);
 
-    if (metadata) {
-      formData.append("projectName", metadata.projectName ?? "")
-      formData.append("budget", metadata.budget?.toString() ?? "0")
-      formData.append("budgetCurrency", metadata.budgetCurrency ?? "")
-      formData.append("startDate", metadata.startDate ?? "")
-      formData.append("endDate", metadata.endDate ?? "")
-      formData.append("priority", metadata.priority ?? "Medium")
-      formData.append("department", metadata.department ?? "")
-      formData.append("descriptionMeta", metadata.description ?? "")
-    }
-
-    // Use /api prefix only; Vite proxy handles localhost:8001
     const response = await axios.post<RfpProject>(
-      `/api/v1/rfp-projects`,
+      `${API_URL}/rfp-projects/`,
       formData,
       {
         headers: {
@@ -177,18 +164,55 @@ export const createRfpProject = async (
           "Content-Type": "multipart/form-data",
         },
       }
-    )
+    );
 
-    return response.data
+    return response.data;
   } catch (error: any) {
-    console.error("Upload error:", error)
+    console.error("RFP project creation error:", error);
     throw new Error(
-      error.response?.data?.message || error.message || "Upload failed"
-    )
+      error.response?.data?.message || "Failed to create RFP project"
+    );
   }
-}
+};
 
 
+// ------------------ Proposal Download ------------------
+export const downloadProposalFile = async (
+  projectId: number,
+  format: "pdf" | "docx",
+  token: string
+) => {
+  try {
+    const response = await axios.get(
+      `/api/v1/rfp-projects/${projectId}/download-proposal?format=${format}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob", // important for binary file
+      }
+    );
+
+    // Extract filename from header
+    const disposition = response.headers["content-disposition"];
+    const filename =
+      disposition?.split("filename=")[1]?.replace(/["']/g, "") ||
+      `proposal_${projectId}.${format}`;
+
+    // Create blob download link
+    const url = window.URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return true;
+  } catch (error: any) {
+    console.error("Proposal download failed:", error);
+    throw error;
+  }
+};
 
 
 
