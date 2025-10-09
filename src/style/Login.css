@@ -13,11 +13,19 @@
   --gradient-end: #9370db;
 }
 
-.login-page {
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+}
+
+.login-page {
+  background: transparent;
   color: #ffffff;
   position: relative;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
 .login-container {

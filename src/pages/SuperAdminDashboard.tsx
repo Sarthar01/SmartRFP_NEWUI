@@ -220,7 +220,6 @@ const SkeletonCard: React.FC = () => {
       <div className="skeleton skeleton-line" />
       <div className="skeleton skeleton-badge" />
       <div className="skeleton skeleton-line" />
-      <div className="skeleton skeleton-badge" />
     </div>
   );
 };
@@ -249,8 +248,8 @@ const SuperAdminHeader: React.FC<{ activeTab: string; onTabChange: (tab: string)
               <path d="M16 12L24 20L16 28L8 20L16 12Z" fill="url(#logoGradient)" opacity="0.7" />
               <defs>
                 <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#8B5CF6" />
-                  <stop offset="100%" stopColor="#C084FC" />
+                  <stop offset="0%" stopColor="#007BFF" />
+                  <stop offset="100%" stopColor="#0056B3" />
                 </linearGradient>
               </defs>
             </svg>
@@ -312,35 +311,32 @@ const Overview: React.FC = () => {
         const baseStats = statsRes.data || {};
 
         // Organizations
-        const orgs = orgsRes.data || [];
+        const orgs = extractListFromResponse(orgsRes.data) || [];
         const activeOrganizations = orgs.filter((o: any) => o.is_active).length;
 
         // Users
-        const users = usersRes.data || [];
+        const users = extractListFromResponse(usersRes.data) || [];
         const activeUsers = users.filter((user: any) => user.is_active).length;
         const totalSuperadmins = users.filter((u: any) => u.role === 'superadmin').length;
 
         // Pending requests
-const requests = reqsRes.data || [];
-const pendingRequests = requests.filter((r: any) => r.status === 'pending').length;
+        const requests = extractListFromResponse(reqsRes.data) || [];
+        const pendingRequests = requests.filter((r: any) => r.status === 'pending').length;
 
-// Map & normalize API response
-const normalized = requests.slice(0, 5).map(mapApiAccessRequest);
-setRequests(normalized);
+        // Map & normalize API response
+        const normalized = requests.slice(0, 5).map(mapApiAccessRequest);
+        setRequests(normalized);
 
+        // Save stats
+        setStats({
+          total_organizations: baseStats.total_organizations ?? orgs.length,
+          total_users: baseStats.total_users ?? users.length,
+          active_organizations: activeOrganizations,
+          active_users: activeUsers,
+          total_superadmins: totalSuperadmins,
+          pending_access_requests: pendingRequests,                          
+        });
 
-// Save stats
-setStats({
-  total_organizations: baseStats.total_organizations ?? orgs.length,
-  total_users: baseStats.total_users ?? users.length,
-  active_organizations: activeOrganizations,
-  active_users: activeUsers,
-  total_superadmins: totalSuperadmins,
-  pending_access_requests: pendingRequests,                          
-});
-
-        // Save top 5 recent requests
-        
       } catch (err) {
         console.error('Error fetching stats:', err);
         setError('Failed to fetch statistics');
@@ -450,15 +446,16 @@ const Users: React.FC = () => {
         ]);
 
         const orgMap: Record<number, any> = {};
-        orgsRes.data.forEach((o: any) => (orgMap[o.id] = o));
+        (extractListFromResponse(orgsRes.data)).forEach((o: any) => (orgMap[o.id] = o));
 
-        const normalUsers: User[] = usersRes.data
+        const allUsers = extractListFromResponse(usersRes.data);
+        const normalUsers: User[] = allUsers
           .filter((u: any) => u.role.toLowerCase() === "user" && u.is_active)
           .map((u: any) => ({
             id: u.id,
             name: u.full_name,
             email: u.email,
-            company: u.organization?.name || "N/A",
+            company: orgMap[u.organization_id]?.name || "N/A",
             orgId: u.organization_id || null,
             role: u.role,
             status: "active",
@@ -467,13 +464,13 @@ const Users: React.FC = () => {
               : "N/A",
           }));
 
-        const revoked: User[] = revokedRes.data
+        const revoked: User[] = (extractListFromResponse(revokedRes.data))
           .filter((u: any) => u.role.toLowerCase() === "user")
           .map((u: any) => ({
             id: u.id,
             name: u.full_name,
             email: u.email,
-            company: u.organization?.name || "N/A",
+            company: orgMap[u.organization_id]?.name || "N/A",
             orgId: u.organization_id || null,
             role: u.role,
             status: "inactive",
@@ -529,52 +526,47 @@ const Users: React.FC = () => {
       </div>
 
       {/* Active Users Grid */}
-      <div className="users-grid">
+      <div className="admin-users-grid">
         {users.map((user) => (
-          <div key={user.id} className="user-card">
-            <div className="user-info">
+          <div key={user.id} className="admin-card">
+            <div className="admin-info">
               <h4>{user.name}</h4>
-              <p>{user.email}</p>
-              <p>{user.company}</p>
-              <p>Status: {user.status}</p>
-              <p>Joined: {user.joined}</p>
+              <p className='admin-email'>{user.email}</p>
+              <p className='admin-company'>{user.company}</p>
+              <p className={`status-badge ${user.status.toLowerCase()}`}>{user.status}</p>
+              <p className='admin-email'>Joined: {user.joined}</p>
             </div>
-            <div className="user-actions">
-              <button onClick={() => setSelectedUser(user)}>View Details</button>
+            <div className="admin-actions">
+              <button className="view-btn" onClick={() => setSelectedUser(user)}>View Details</button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Revoked Users Section */}
-      {revokedUsers.length > 0 && (
+      {showRevoked && revokedUsers.length > 0 && (
         <div className={`revoked-container ${showRevoked ? "revoked-show" : ""}`}>
           <h3 className="revoked-title">
             Revoked Users ({revokedUsers.length})
           </h3>
-          {revokedUsers.length === 0 ? (
-            <p>No revoked users</p>
-          ) : (
-            <div className="revoked-grid">
-              {revokedUsers.map((user) => (
-                <div key={user.id} className="revoked-card">
-                  <div className="revoked-avatar">{user.name.charAt(0)}</div>
-                  <div className="revoked-info">
-                    <h4>{user.name}</h4>
-                    <p>{user.email}</p>
-                    <p>{user.company}</p>
-                    <p className="revoked-status">Status: {user.status}</p>
-                    <p>Joined: {user.joined}</p>
-                  </div>
-                  <div className="user-actions">
-                    <button onClick={() => setSelectedUser(user)}>
-                      View Details
-                    </button>
-                  </div>
+          <div className="revoked-grid">
+            {revokedUsers.map((user) => (
+              <div key={user.id} className="revoked-card">
+                <div className="revoked-avatar">{user.name.charAt(0)}</div>
+                <div className="revoked-info">
+                  <h4>{user.name}</h4>
+                  <p>{user.email}</p>
+                  <p>{user.company}</p>
+                  <p className="revoked-status">Status: {user.status}</p>
+                  <p>Joined: {user.joined}</p>
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="user-actions">
+                  <button onClick={() => setSelectedUser(user)}>
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -637,12 +629,15 @@ const AdminUsers: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const usersRes = await api.get('/superadmin/users');
-        const users = usersRes.data;
-        const orgsRes = await api.get('/superadmin/organizations');
-        const orgs = orgsRes.data;
-        const revokedRes = await api.get('/superadmin/revoked-users');
-        
+        const [usersRes, orgsRes, revokedRes] = await Promise.all([
+          api.get('/superadmin/users'),
+          api.get('/superadmin/organizations'),
+          api.get('/superadmin/revoked-users'),
+        ]);
+
+        const users = extractListFromResponse(usersRes.data);
+        const orgs = extractListFromResponse(orgsRes.data);
+        const revoked = extractListFromResponse(revokedRes.data);
 
         const orgMap: Record<number, any> = {};
         orgs.forEach((o: any) => { orgMap[o.id] = o; });
@@ -658,28 +653,26 @@ const AdminUsers: React.FC = () => {
           role: a.role,
           status: a.is_active ? 'active' : 'inactive',
           joined: a.created_at ? new Date(a.created_at).toLocaleDateString() : "N/A",
-          subscription_tier: orgMap[a.organization_id]?.subscription_tier || "Standard" // <-- Add subscription tier
+          subscription_tier: orgMap[a.organization_id]?.subscription_tier || "Standard"
         }));
-        const revoked: AdminUser[] = revokedRes.data
-  .filter((u: any) => u.role.toLowerCase() === "admin")
-  .map((u: any) => ({
-    id: u.id,
-    name: u.full_name,
-    email: u.email,
-    company: u.organization?.name || "N/A",
-    orgId: u.organization_id || null,
-    role: u.role,
-    status: "inactive",
-    joined: u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A",
-    subscription_tier: "Standard", 
-    totalAllowed: 30,               
-    remaining: 0                    
-  }));
 
-setRevokedUsers(revoked);
+        const revokedMapped: AdminUser[] = revoked
+          .filter((u: any) => u.role.toLowerCase() === "admin")
+          .map((u: any) => ({
+            id: u.id,
+            name: u.full_name,
+            email: u.email,
+            company: orgMap[u.organization_id]?.name || "N/A",
+            orgId: u.organization_id || null,
+            role: u.role,
+            status: "inactive",
+            joined: u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A",
+            subscription_tier: "Standard", 
+            totalAllowed: 30,               
+            remaining: 0                    
+          }));
 
-
-
+        setRevokedUsers(revokedMapped);
         setAdminUsers(mapped);
       } catch (err) {
         console.error("Error fetching admin users:", err);
@@ -700,33 +693,19 @@ setRevokedUsers(revoked);
         organization_name: newAdminForm.company,
       };
       const response = await api.post('/superadmin/invite-admin-new-organization', payload);
-      const created = extractListFromResponse(response.data)[0] ?? response.data;
+      const created = response.data.user ?? extractListFromResponse(response.data)[0] ?? response.data;
       const mapped = mapApiUserToAdmin(created);
       setAdminUsers((prev) => [...prev, mapped]);
       setNewAdminForm({ name: '', email: '', company: '', subscription: 'Standard', totalAllowed: 30 });
       setShowCreateForm(false);
     } catch (err) {
       console.error('Error creating admin user:', err);
-      const fallback: AdminUser = {
-        id: Date.now(),
-        name: newAdminForm.name,
-        email: newAdminForm.email,
-        company: newAdminForm.company,
-        subscription_tier: newAdminForm.subscription,
-        totalAllowed: newAdminForm.totalAllowed,
-        remaining: newAdminForm.totalAllowed,
-        orgId: null,
-        role: "admin",
-        status: "active",
-        joined: new Date().toLocaleDateString(),
-      };
-      setAdminUsers((prev) => [...prev, fallback]);
-      setShowCreateForm(false);
+      alert('Failed to create admin user. See console for details.');
     }
   };
 
   const handleDeleteAdmin = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    if (!window.confirm('Are you sure you want to revoke this admin\'s access?')) return;
     try {
       await api.post(`/superadmin/revoke-admin-access/${id}`);
       setAdminUsers((prev) => prev.filter((a) => a.id !== id));
@@ -776,7 +755,7 @@ const filteredAdmins = adminUsers.filter(admin =>
     <button className="clear-search-btn" onClick={() => setSearchTerm("")}>×</button>
   )}
 </div>
-{revokedUsers.length > 0 && (
+        {revokedUsers.length > 0 && (
           <button
             className="create-btn"
             onClick={() => setShowRevoked((prev) => !prev)}
@@ -832,7 +811,7 @@ const filteredAdmins = adminUsers.filter(admin =>
             <p><strong>Subscription:</strong> {selectedUser.subscription_tier}</p>
             <div className="modal-actions">
               <button className="delete-btn" onClick={() => handleDeleteAdmin(selectedUser.id)}>Revoke Access</button>
-              <button className="close-btn" onClick={() => setSelectedUser(null)}></button>
+              <button className="cancel-btn" onClick={() => setSelectedUser(null)}>Close</button>
             </div>
           </div>
         </div>
@@ -866,43 +845,32 @@ const filteredAdmins = adminUsers.filter(admin =>
                   <option value="Premium">Premium</option>
                   <option value="Enterprise">Enterprise</option>
                 </select>
-                <div className="form-actions">
-                  <button type="button" className="cancel-btn" onClick={() => setShowCreateForm(false)}>Cancel</button>
-                  <button type="submit" className="submit-btn">Create Admin</button>
-                </div>
+              </div>
+              <div className="form-actions">
+                <button type="button" className="cancel-btn" onClick={() => setShowCreateForm(false)}>Cancel</button>
+                <button type="submit" className="submit-btn">Create Admin</button>
               </div>
             </form>
           </div>
         </div>
       )}
-      {revokedUsers.length > 0 && (
-        <div className={`revoked-container ${showRevoked ? "revoked-show" : ""}`}>
-          <h3 className="revoked-title">
-            Revoked Users ({revokedUsers.length})
-          </h3>
-          {revokedUsers.length === 0 ? (
-            <p>No revoked users</p>
-          ) : (
-            <div className="revoked-grid">
-              {revokedUsers.map((user) => (
-                <div key={user.id} className="revoked-card">
-                  <div className="revoked-avatar">{user.name.charAt(0)}</div>
-                  <div className="revoked-info">
-                    <h4>{user.name}</h4>
-                    <p>{user.email}</p>
-                    <p>{user.company}</p>
-                    <p className="revoked-status">Status: {user.status}</p>
-                    <p>Joined: {user.joined}</p>
-                  </div>
-                  <div className="user-actions">
-                    <button onClick={() => setSelectedUser(user)}>
-                      View Details
-                    </button>
-                  </div>
+      {showRevoked && revokedUsers.length > 0 && (
+        <div className="revoked-container show">
+          <h3 className="revoked-title">Revoked Users ({revokedUsers.length})</h3>
+          <div className="revoked-grid">
+            {revokedUsers.map((user) => (
+              <div key={user.id} className="revoked-card">
+                <div className="revoked-avatar">{user.name.charAt(0)}</div>
+                <div className="revoked-info">
+                  <h4>{user.name}</h4>
+                  <p>{user.email}</p>
+                  <p>{user.company}</p>
+                  <p className="revoked-status">Status: {user.status}</p>
+                  <p>Joined: {user.joined}</p>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -929,7 +897,7 @@ const filteredAdmins = adminUsers.filter(admin =>
         try {
           // Get master superadmin info
           const masterInfo = await api.get('/superadmin/master-superadmin-info');
-          const masterAdminId = masterInfo.data.is_current_user_master;
+          const masterAdminId = masterInfo.data.master_admin_id;
 
           // Get all superadmins
           const response = await api.get('/superadmin/superadmins');
@@ -939,13 +907,15 @@ const filteredAdmins = adminUsers.filter(admin =>
             isMasterAdmin: admin.id === masterAdminId
           }));
           setSuperAdmins(mapped);
-        const revokedRes = await api.get('/superadmin/revoked-superadmins');
-const revokedList = extractListFromResponse(revokedRes.data);
-const revokedMapped = revokedList.map((admin: any) => ({
-  ...mapApiSuperAdmin(admin),
-  isActive: false
-}));
-setRevokedSuperAdmins(revokedMapped);
+
+          // Get revoked superadmins
+          const revokedRes = await api.get('/superadmin/revoked-superadmins');
+          const revokedList = extractListFromResponse(revokedRes.data);
+          const revokedMapped = revokedList.map((admin: any) => ({
+            ...mapApiSuperAdmin(admin),
+            isActive: false
+          }));
+          setRevokedSuperAdmins(revokedMapped);
 
         } catch (err) {
           console.error('Error fetching super admins:', err);
@@ -963,15 +933,12 @@ setRevokedSuperAdmins(revokedMapped);
       e.preventDefault();
       try {
         const payload = { email: newSuperAdminForm.email, full_name: newSuperAdminForm.name };
-        console.debug('POST /superadmin/invite-superadmin payload:', payload);
         const response = await api.post('/superadmin/invite-superadmin', payload);
-        console.debug('invite-superadmin response:', JSON.stringify(response.data, null, 2));
         const created = response.data.user ?? extractListFromResponse(response.data)[0] ?? response.data;
         const mapped = mapApiSuperAdmin(created);
         setSuperAdmins((prev) => [...prev, mapped]);
         setNewSuperAdminForm({ name: '', email: '', password: '' });
         setShowCreateForm(false);
-        
       } catch (err) {
         console.error('Error creating super admin:', err);
         alert('Failed to create super admin. See console.');
@@ -1189,8 +1156,8 @@ setRevokedSuperAdmins(revokedMapped);
     const handleRequestAction = async (id: number, action: 'approve' | 'deny') => {
       if (!window.confirm(`Are you sure you want to ${action} this request?`)) return;
       try {
-        const payload = { action, review_notes: action === 'approve' ? 'Approved' : 'Denied' };
-        await api.post(`/superadmin/access-requests/${id}/review`, payload);
+        const payload = { review_notes: action === 'approve' ? 'Approved' : 'Denied' };
+        await api.post(`/superadmin/access-requests/${id}/review`, payload, { params: { action } });
         setAccessRequests((prev) => 
           prev.map((req) => 
             req.id === id ? { ...req, status: action === 'approve' ? 'approved' : 'denied' } : req
@@ -1316,7 +1283,7 @@ const handleSubscriptionUpdate = async () => {
   try {
     await api.patch(
       `/superadmin/organizations/${editingOrg.id}/subscription`,
-      {}, // empty body
+      { }, // empty body
       {
         params: {
           subscription_tier: newSubscription, // free | plus | enterprise
@@ -1362,8 +1329,9 @@ const handleInviteAdmin = async () => {
       );
 
       alert(
-        `Admin invited successfully! Temp Password: ${response.data.temporary_password}`
+        `Admin invited successfully! Check console for temporary password.`
       );
+      console.log('Temporary Password:', response.data.temporary_password);
       setInviteOrg(null);
       setInviteEmail("");
       setInviteFullName("");
@@ -1460,11 +1428,11 @@ const handleInviteAdmin = async () => {
             onChange={(e) =>
               setNewSubscription(e.target.value as 'free' | 'plus' | 'enterprise')
             }
+            style={{ color: 'black' }}
           >
-            <option value="free" style={{ color: "black" }}>Free</option>
-<option value="plus" style={{ color: "black" }}>Plus</option>
-<option value="enterprise" style={{ color: "black" }}>Enterprise</option>
-
+            <option value="free">Free</option>
+            <option value="plus">Plus</option>
+            <option value="enterprise">Enterprise</option>
           </select>
         </label>
 
