@@ -4,8 +4,8 @@
   flex-direction: column;
   min-height: 100vh;
   font-family: "Inter", sans-serif;
-  background: linear-gradient(160deg, #1e1e2f 0%, #2b2b3c 100%);
-  color: #f5f5f5;
+  background-color: #f8f9fa;
+  color: #212529;
   animation: fadeIn 0.6s ease;
 }
 
@@ -14,30 +14,28 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(40, 40, 60, 0.85);
+  background: #ffffff;
   backdrop-filter: blur(12px);
-  color: #fff;
+  color: #212529;
   padding: 0.75rem 2rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  border-radius: 0 0 16px 16px;
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .admin-dashboard .navbar .logo {
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: 2px;
-  color: #fcf9fb;
-  
+  color: #007bff;
 }
 
 .admin-dashboard .navbar nav button {
   background: transparent;
   border: none;
-  color: #f5f5f5;
+  color: #6c757d;
   font-size: 1rem;
   margin-left: 1.5rem;
   display: inline-flex;
@@ -45,6 +43,11 @@
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+}
+
+.admin-dashboard .navbar nav button.active,
+.admin-dashboard .navbar nav button:hover {
+  color: #007bff;
 }
 
 .admin-dashboard .navbar nav button.active::after,
@@ -55,13 +58,13 @@
   left: 0;
   width: 100%;
   height: 3px;
-  background: #ff71ce;
+  background: #007bff;
   border-radius: 4px;
 }
 
 .admin-dashboard .navbar nav button svg {
   margin-right: 0.5rem;
-  color: #ff71ce;
+  color: #007bff;
 }
 
 /* ============ Main Content ============ */
@@ -76,24 +79,35 @@
   margin-bottom: 2rem;
   font-size: 2.5rem;
   font-weight: 800;
-  color: #fff;
-  text-shadow: 0 0 10px #ff71ce, 0 0 20px #ff71ce;
+  color: #343a40;
 }
 
 /* ============ Card ============ */
 .admin-dashboard .card {
-  background: rgba(30, 30, 50, 0.85);
+  background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.05);
   padding: 2rem;
   margin-bottom: 2rem;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid #e9ecef;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.admin-dashboard .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 123, 255, 0.1);
+}
+
+.admin-dashboard .card h2 {
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #007bff;
+}
+
 /* Navbar Back Button */
 .btn-back-navbar {
-  background: linear-gradient(135deg, #7b2ff7, #1e3c72);
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: #fff;
   border: none;
   padding: 0.45rem 1rem;
@@ -104,26 +118,14 @@
   display: inline-flex;
   align-items: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(123, 47, 247, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 123, 255, 0.3);
   font-size: 0.9rem;
 }
 
 .btn-back-navbar:hover {
   transform: scale(1.05);
-  background: linear-gradient(135deg, #1e3c72, #7b2ff7);
-  box-shadow: 0 6px 20px rgba(123, 47, 247, 0.7);
-}
-
-.admin-dashboard .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 50px rgba(255, 113, 206, 0.4);
-}
-
-.admin-dashboard .card h2 {
-  margin-bottom: 1rem;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #ff71ce;
+  background: linear-gradient(135deg, #0056b3, #007bff);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
 }
 
 /* ============ Invite Form ============ */
@@ -138,23 +140,23 @@
 .admin-dashboard .invite-form select {
   padding: 0.7rem 1rem;
   border-radius: 12px;
-  border: 1px solid #ff71ce;
+  border: 1px solid #ced4da;
   font-size: 0.95rem;
   flex: 1;
-  background: rgba(255,255,255,0.05);
-  color: #fff;
+  background: #fff;
+  color: #495057;
   transition: all 0.3s ease;
 }
 
 .admin-dashboard .invite-form input:focus,
 .admin-dashboard .invite-form select:focus {
-  border-color: #ff71ce;
-  box-shadow: 0 0 10px #ff71ce;
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
   outline: none;
 }
 
 .admin-dashboard .invite-form button.btn-primary {
-  background: linear-gradient(135deg, #ff71ce, #ff5eb4);
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: #fff;
   border: none;
   padding: 0 1.5rem;
@@ -164,12 +166,12 @@
   align-items: center;
   font-weight: 700;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(255,113,206,0.5);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
 }
 
 .admin-dashboard .invite-form button.btn-primary:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 30px rgba(255,113,206,0.7);
+  box-shadow: 0 8px 30px rgba(0, 123, 255, 0.4);
 }
 
 .admin-dashboard .invite-form button svg {
@@ -178,26 +180,24 @@
 
 /* ============ Warning ============ */
 .admin-dashboard .warning {
-  background: rgba(255, 195, 160, 0.2);
-  color: #ff9f43;
+  background: #fff3cd;
+  color: #856404;
   padding: 0.8rem 1rem;
-  border-left: 4px solid #ff9f43;
+  border-left: 4px solid #ffc107;
   border-radius: 8px;
   margin-bottom: 1rem;
   font-weight: 500;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
 }
 
 /* ============ Error ============ */
 .admin-dashboard .error {
-  background: rgba(255, 77, 77, 0.2);
-  color: #ff4d4d;
+  background: #f8d7da;
+  color: #721c24;
   padding: 0.8rem 1rem;
-  border-left: 4px solid #ff4d4d;
+  border-left: 4px solid #dc3545;
   border-radius: 8px;
   margin-bottom: 1rem;
   font-weight: 500;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
 }
 
 /* ============ User Table ============ */
@@ -206,8 +206,8 @@
   border-collapse: collapse;
   overflow: hidden;
   border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  background: rgba(20,20,40,0.8);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  background: #ffffff;
 }
 
 .admin-dashboard .user-table th,
@@ -215,37 +215,37 @@
   padding: 1rem;
   text-align: left;
   font-size: 0.95rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
+  border-bottom: 1px solid #dee2e6;
+  color: #212529;
 }
 
 .admin-dashboard .user-table th {
-  background: rgba(40,40,60,0.8);
+  background: #f8f9fa;
   font-weight: 600;
-  color: #ff71ce;
+  color: #007bff;
 }
 
 .admin-dashboard .user-table tr:hover td {
-  background: rgba(255,113,206,0.05);
+  background: #f1f3f5;
 }
 
 .admin-dashboard .user-table td select {
   padding: 0.5rem;
   border-radius: 8px;
-  border: 1px solid #ff71ce;
+  border: 1px solid #ced4da;
   font-size: 0.85rem;
-  background: rgba(255,255,255,0.05);
-  color: #fff;
+  background: #fff;
+  color: #495057;
 }
 
 .admin-dashboard .user-table td select:focus {
   outline: none;
-  border-color: #ff71ce;
-  box-shadow: 0 0 10px #ff71ce;
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
 
 .admin-dashboard .user-table button.btn-danger {
-  background: #ff4d4d;
+  background: #dc3545;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -255,7 +255,7 @@
 }
 
 .admin-dashboard .user-table button.btn-danger:hover {
-  background: #ff1a1a;
+  background: #c82333;
   transform: scale(1.05);
 }
 
@@ -266,7 +266,7 @@
   align-items: center;
   font-size: 1.5rem;
   padding: 3rem;
-  color: #ff71ce;
+  color: #007bff;
   animation: pulse 1.5s infinite;
 }
 

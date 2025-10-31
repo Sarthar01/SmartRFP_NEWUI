@@ -3,9 +3,6 @@
 .login-page {
   background: #ffffff;
   color: #212529;
-  position: relative;
-  overflow-x: hidden;
-  min-height: 100vh;
 }
 
 .login-container {
