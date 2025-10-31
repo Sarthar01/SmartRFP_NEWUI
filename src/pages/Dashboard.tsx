@@ -475,6 +475,7 @@ const formatFileSize = (size: number) => `${(size / 1024).toFixed(2)} KB`;
     aria-label="Upload RFP documents"
   >
     <input
+    
       type="file"
       ref={fileInputRef}
       onChange={handleFileInputChange}
@@ -691,16 +692,33 @@ const formatFileSize = (size: number) => `${(size / 1024).toFixed(2)} KB`;
                 {/* Box8 - AI Queue */}
                 <div className="box8-container">
                   <div className="box8-content">
+                    <div className="queue-icon">
+                      🤖
+                    </div>
                     <h3 className="box8-title">AI Queue Overview</h3>
+
                     {queueStats ? (
-                      <p>
-                        {queueStats.pending || 0} proposals pending AI
-                        processing
-                      </p>
+                      <div className="queue-stats-container">
+                        <div className="queue-number">{queueStats.pending || 0}</div>
+                        <div className="queue-label">Proposals Pending</div>
+                        <div className="queue-description">
+                          AI processing queue for proposal generation and analysis
+                        </div>
+                        <div className={`queue-status ${queueStats.pending > 0 ? 'processing' : 'idle'}`}>
+                          <div className="status-indicator"></div>
+                          <span className="status-text">
+                            {queueStats.pending > 0 ? 'Processing' : 'Ready'}
+                          </span>
+                        </div>
+                      </div>
                     ) : (
-                      <p>Loading queue stats...</p>
+                      <div className="loading-text">
+                        <div className="loading-spinner"></div>
+                        Loading queue stats...
+                      </div>
                     )}
                   </div>
+
                 </div>
               </div>
             </div>

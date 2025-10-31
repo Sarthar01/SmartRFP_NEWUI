@@ -256,14 +256,14 @@ const Sidebar = () => {
           </button>
 
           <div className="logo">
-  SmartRFP
-  {userData?.role === "admin" && !collapsed && (
-    <span style={{ fontSize: "0.75rem", color: "#60a5fa", display: "block" }}>
-      Admin Portal
-    </span>
-  )}
- 
-</div>
+            SmartRFP
+            {userData?.role === "admin" && !collapsed && (
+              <span style={{ fontSize: "0.75rem", color: "#60a5fa", display: "block" }}>
+                Admin Portal
+              </span>
+            )}
+
+          </div>
 
           <nav className="menu">{menuItems.map(renderMenuItem)}</nav>
         </div>
@@ -274,14 +274,9 @@ const Sidebar = () => {
               <div className="profile-icon"><FaUser /></div>
               <div className="user-info">
                 <div className="name">
-  {currentUser.name}
-  {userData?.role === "admin" && !collapsed && (
-    <span style={{ fontSize: "0.7rem", color: "#60a5fa", marginLeft: "0.5rem" }}>
-      (Admin)
-    </span>
-  )}
-  
-</div>
+                  {currentUser.name}
+
+                </div>
                 <div className="email">{currentUser.email}</div>
               </div>
             </div>

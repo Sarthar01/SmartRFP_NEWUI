@@ -529,18 +529,18 @@ const Users: React.FC = () => {
       </div>
 
       {/* Active Users Grid */}
-      <div className="users-grid">
+      <div className="admin-users-grid">
         {users.map((user) => (
-          <div key={user.id} className="user-card">
-            <div className="user-info">
+          <div key={user.id} className="admin-card">
+            <div className="admin-info">
               <h4>{user.name}</h4>
-              <p>{user.email}</p>
-              <p>{user.company}</p>
-              <p>Status: {user.status}</p>
-              <p>Joined: {user.joined}</p>
+              <p className='admin-email'>{user.email}</p>
+              <p className='admin-company'>{user.company}</p>
+              <p className={`status-badge ${user.status.toLowerCase()}`}>{user.status}</p>
+              <p className='admin-email'>Joined: {user.joined}</p>
             </div>
-            <div className="user-actions">
-              <button onClick={() => setSelectedUser(user)}>View Details</button>
+            <div className="admin-actions">
+              <button className="view-btn" onClick={() => setSelectedUser(user)}>View Details</button>
             </div>
           </div>
         ))}
